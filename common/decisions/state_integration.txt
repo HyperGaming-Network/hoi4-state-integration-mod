@@ -1,0 +1,349 @@
+SKS_state_integration_category = {
+    show_hide_integration_decisions = {
+        priority = 5
+        visible = { always = yes }
+
+        complete_effect = { 
+            if = {
+                limit = { has_country_flag = show_integration_decisions }
+                clr_country_flag = show_integration_decisions
+            }
+            else = {
+                set_country_flag = show_integration_decisions
+            }
+        }
+    }
+
+    integrate_the_state_of_FROM_peacefully = {
+        icon = GFX_decision_generic_nationalism
+
+        on_map_mode = map_only
+
+        state_target = yes 
+
+        target_array = controlled_states
+		
+		ai_will_do = {
+			base = 20
+		}
+
+        target_trigger = {
+            FROM = {
+                is_fully_controlled_by = ROOT
+				NOT = { is_core_of = ROOT }
+            }
+        }
+
+        available = {
+			if = {
+				FROM = {
+					compliance > 75
+					resistance < 10
+					set_temp_variable = { SKS_state_pop = state_population }
+					clamp_temp_variable = { var = SKS_state_pop min = 0 max = 500000}
+				}
+			}
+			
+			
+			set_temp_variable = { SKS_state_pp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_pp_cost = 1000 }
+			clamp_temp_variable = { var = SKS_state_pp_cost min = 0 max = 250}
+			round_temp_variable = SKS_state_pp_cost
+			
+			if = {
+				limit = {
+					check_variable = { SKS_state_pp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_pp_cost = 250 }
+			}
+			
+			check_variable = { ROOT.political_power > SKS_state_pp_cost }
+			has_political_power > SKS_state_pp_cost
+			
+			set_temp_variable = { SKS_state_mp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_mp_cost = 100 }
+			clamp_temp_variable = { var = SKS_state_mp_cost min = 0 max = 500}
+			round_temp_variable = SKS_state_mp_cost
+			if = {
+				limit = {
+					check_variable = { SKS_state_mp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_mp_cost = 500 }
+			}
+            has_manpower > SKS_state_mp_cost
+            has_equipment = {
+                infantry_equipment > SKS_state_mp_cost
+            }
+        }
+
+        visible = {
+            NOT = { has_country_flag = show_integration_decisions }
+			FROM = { 
+				NOT = { is_core_of = ROOT } 
+				NOT = { has_state_flag = being_cored } 
+			}
+        }
+
+        custom_cost_trigger = {
+            has_political_power > SKS_state_pp_cost
+        }
+
+        custom_cost_text = SKS_cct_peaceful_text
+		
+        days_remove = SKS_state_pp_cost
+
+        complete_effect = {
+			if = {
+				FROM = {
+					set_temp_variable = { SKS_state_pop = state_population }
+					clamp_temp_variable = { var = SKS_state_pop min = 0 max = 500000}
+				}
+			}
+			
+			set_temp_variable = { SKS_state_pp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_pp_cost = 1000 }
+			clamp_temp_variable = { var = SKS_state_pp_cost min = 0 max = 250}
+			round_temp_variable = SKS_state_pp_cost
+			
+			if = {
+				limit = {
+					check_variable = { SKS_state_pp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_pp_cost = 250 }
+			}
+			
+			set_temp_variable = { SKS_state_mp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_mp_cost = 100 }
+			clamp_temp_variable = { var = SKS_state_mp_cost min = 0 max = 500}
+			round_temp_variable = SKS_state_mp_cost
+			if = {
+				limit = {
+					check_variable = { SKS_state_mp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_mp_cost = 500 }
+			}
+		
+			set_temp_variable = { SKS_p_pp_cost_t = SKS_state_pp_cost }
+			set_temp_variable = { SKS_p_mp_cost_t = SKS_state_mp_cost }
+			set_temp_variable = { SKS_p_inf_cost_t = SKS_state_mp_cost }
+			multiply_temp_variable = { SKS_p_pp_cost_t = -1 }
+			multiply_temp_variable = { SKS_p_mp_cost_t = -1 }
+			multiply_temp_variable = { SKS_p_inf_cost_t = -1 }
+            add_manpower = SKS_p_mp_cost_t
+			add_political_power = SKS_p_pp_cost_t
+            add_equipment_to_stockpile = {
+			    type = infantry_equipment
+			    amount = SKS_p_inf_cost_t
+			}
+			hidden_effect = {
+				FROM = { 
+					set_state_flag = being_cored
+				}
+				if = {
+					limit = { check_variable = { has_political_power < 20 } }
+				}
+			}
+        }
+
+        remove_effect = {
+            FROM = {
+                add_core_of = ROOT
+				clr_state_flag = being_cored
+            }
+			country_event = { id = eventstatecored.1 }
+        }
+    }
+
+    integrate_the_state_of_FROM_by_force = {
+        icon = GFX_decision_oppression
+
+        on_map_mode = map_only
+
+        state_target = yes 
+
+        target_array = controlled_states
+		
+		ai_will_do = {
+			base = 10
+		}
+
+        target_trigger = {
+            FROM = {
+                is_fully_controlled_by = ROOT
+				NOT = { is_core_of = ROOT }
+            }
+        }
+
+        available = {
+            NOT = {
+				OR = {
+					has_government = neutrality
+					has_government = democratic
+				}
+			}
+			if = {
+				FROM = {
+					compliance > 20
+					resistance < 26
+					set_temp_variable = { SKS_state_pop = state_population }
+					clamp_temp_variable = { var = SKS_state_pop min = 0 max = 500000}
+				}
+			}
+			set_temp_variable = { SKS_state_pp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_pp_cost = 1000 }
+			clamp_temp_variable = { var = SKS_state_pp_cost min = 0 max = 100}
+			round_temp_variable = SKS_state_pp_cost
+			
+			if = {
+				limit = {
+					check_variable = { SKS_state_pp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_pp_cost = 100 }
+			}
+			
+			check_variable = { ROOT.political_power > SKS_state_pp_cost }
+			has_political_power > SKS_state_pp_cost
+			
+			set_temp_variable = { SKS_state_mp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_mp_cost = 100 }
+			multiply_temp_variable = { SKS_state_mp_cost = 3 }
+			clamp_temp_variable = { var = SKS_state_mp_cost min = 0 max = 1500}
+			round_temp_variable = SKS_state_mp_cost
+			if = {
+				limit = {
+					check_variable = { SKS_state_mp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_mp_cost = 1500 }
+			}
+            has_manpower > SKS_state_mp_cost
+            has_equipment = {
+                infantry_equipment > SKS_state_mp_cost
+            }
+        }
+
+        visible = {
+            NOT = { has_country_flag = show_integration_decisions }
+			FROM = {
+				NOT = { is_core_of = ROOT }
+				NOT = { has_state_flag = being_cored }
+			}
+        }
+
+        custom_cost_trigger = {
+            has_political_power > SKS_state_pp_cost
+        }
+
+        custom_cost_text = SKS_cct_aggressively_text
+
+        days_remove = SKS_state_pp_cost
+
+		modifier = {
+			weekly_manpower = -75
+			training_time_factor = 0.1
+		}
+
+        complete_effect = {
+			if = {
+				FROM = {
+					set_temp_variable = { SKS_state_pop = state_population }
+					clamp_temp_variable = { var = SKS_state_pop min = 0 max = 500000}
+				}
+			}
+			
+			set_temp_variable = { SKS_state_pp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_pp_cost = 1000 }
+			clamp_temp_variable = { var = SKS_state_pp_cost min = 0 max = 100}
+			round_temp_variable = SKS_state_pp_cost
+			
+			if = {
+				limit = {
+					check_variable = { SKS_state_pp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_pp_cost = 100 }
+			}
+			
+			set_temp_variable = { SKS_state_mp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_mp_cost = 100 }
+			clamp_temp_variable = { var = SKS_state_mp_cost min = 0 max = 1500}
+			round_temp_variable = SKS_state_mp_cost
+			if = {
+				limit = {
+					check_variable = { SKS_state_mp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_mp_cost = 1500 }
+			}
+		
+			set_temp_variable = { SKS_p_pp_cost_t = SKS_state_pp_cost }
+			set_temp_variable = { SKS_p_mp_cost_t = SKS_state_mp_cost }
+			set_temp_variable = { SKS_p_inf_cost_t = SKS_state_mp_cost }
+			multiply_temp_variable = { SKS_p_pp_cost_t = -1 }
+			multiply_temp_variable = { SKS_p_mp_cost_t = -1 }
+			multiply_temp_variable = { SKS_p_inf_cost_t = -1 }
+            add_manpower = SKS_p_mp_cost_t
+			add_political_power = SKS_p_pp_cost_t
+            add_equipment_to_stockpile = {
+			    type = infantry_equipment
+			    amount = SKS_p_inf_cost_t
+			}
+			hidden_effect = {
+				FROM = { 
+					set_state_flag = being_cored
+				}
+				if = {
+					limit = { check_variable = { has_political_power < 20 } }
+				}
+			}
+        }
+
+        remove_effect = {
+			if = {
+				FROM = {
+					set_temp_variable = { SKS_state_pop = state_population }
+					clamp_temp_variable = { var = SKS_state_pop min = 0 max = 500000}
+				}
+			}
+			
+			set_temp_variable = { SKS_state_pp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_pp_cost = 1000 }
+			clamp_temp_variable = { var = SKS_state_pp_cost min = 0 max = 100}
+			round_temp_variable = SKS_state_pp_cost
+			
+			if = {
+				limit = {
+					check_variable = { SKS_state_pp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_pp_cost = 100 }
+			}
+			
+			set_temp_variable = { SKS_state_mp_cost = SKS_state_pop }
+			divide_temp_variable = { SKS_state_mp_cost = 100 }
+			clamp_temp_variable = { var = SKS_state_mp_cost min = 0 max = 1500}
+			round_temp_variable = SKS_state_mp_cost
+			
+			if = {
+				limit = {
+					check_variable = { SKS_state_mp_cost = 0 }
+				}
+				set_temp_variable = { SKS_state_mp_cost = 1500 }
+			}
+
+            FROM = {
+                add_core_of = ROOT
+				clr_state_flag = being_cored
+				
+				set_temp_variable = { SKS_p_pp_cost_t = SKS_state_pp_cost }
+				set_temp_variable = { SKS_p_mp_cost_t = SKS_state_mp_cost }
+				set_temp_variable = { SKS_p_inf_cost_t = SKS_state_mp_cost }
+				divide_temp_variable = { SKS_p_mp_cost_t = 2 }
+				divide_temp_variable = { SKS_p_inf_cost_t = 2 }
+				
+				add_manpower = SKS_p_mp_cost_t
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = SKS_p_inf_cost_t
+				}
+            }
+			country_event = { id = eventstatecored.1 }
+        }
+    }
+}

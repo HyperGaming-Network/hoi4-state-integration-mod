@@ -1,0 +1,9 @@
+SKS_state_integration_category = {
+    priority = 5
+    icon = GFX_decision_category_spr_the_seeds_of_revolution
+
+    visible = {
+        exists = yes 
+		#is_ai = no 
+    }
+}

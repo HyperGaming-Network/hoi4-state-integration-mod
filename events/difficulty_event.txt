@@ -1,0 +1,17 @@
+add_namespace = eventstatecored
+
+country_event = {
+	id = eventstatecored.1
+	title = eventstatecored.1.t 
+	desc = eventstatecored.1.d 
+	picture = GFX_report_event_soldiers_marching
+	
+	is_triggered_only = yes 
+	
+	immediate = {
+	}	
+	
+	option = {
+		name = eventstatecored.1.a 
+		custom_effect_tooltip = eventstatecored_tt
+	}
